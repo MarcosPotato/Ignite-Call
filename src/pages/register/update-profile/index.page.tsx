@@ -3,9 +3,11 @@ import { Avatar, Button, Heading, MultiStep, Text, TextArea } from "@ignite-ui/r
 import { GetServerSideProps } from "next";
 import { unstable_getServerSession } from "next-auth";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
 import { ArrowRight } from "phosphor-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { api } from "../../../lib/axios";
 import { buildNextAuthOptions } from "../../api/auth/[...nextauth].api";
 import { Container, Header } from "../styles";
 import { FormAnotation, ProfileBox } from "./style";
@@ -25,12 +27,16 @@ export default function UpdateProfile (){
         resolver: zodResolver(prolifeFormSchema),
     })
 
-    const { data } = useSession()
-
-    console.log(data)
-
+    const session = useSession()
+    
+    const router = useRouter()
 
     const handleUserProfile = async (data: ProfileFormInput) => {
+        await api.put("/users/update-profile", {
+            bio: data.bio
+        })
+
+        await router.push(`/schedule/${ session.data?.user.username }`)
     }
 
     return (
@@ -48,7 +54,7 @@ export default function UpdateProfile (){
             <ProfileBox as="form" onSubmit={handleSubmit(handleUserProfile)}>
                 <label>
                     <Text size="sm">Foto de perfil</Text>
-                    <Avatar src={ data?.user.avatar_url } alt={ data?.user.name || "username" }/>
+                    <Avatar src={ session.data?.user.avatar_url } alt={ session.data?.user.name || "username" }/>
                 </label>
                 <label>
                     <Text size="sm">Sobre você</Text>

@@ -9,7 +9,7 @@ import { AuthError, ConnectBox, ConnectItens } from "./styles";
 
 export default function ConnectCallendar() {
 
-    const { data, status } = useSession()
+    const { status } = useSession()
     const router = useRouter()
 
     const hasAuthError = !!router.query.error
@@ -19,7 +19,9 @@ export default function ConnectCallendar() {
         await signIn("google")
     }
 
-    console.log(data)
+    const handleNavigateToNextStep = async() => {
+        await router.push("/register/time-intervals")
+    }
 
     return (
         <Container>
@@ -59,7 +61,8 @@ export default function ConnectCallendar() {
                         </AuthError>
                     ) }
                     <Button 
-                        type="submit"
+                        type="button"
+                        onClick={ handleNavigateToNextStep }
                         disabled={ hasAuthError }
                     >
                         Próximo passo

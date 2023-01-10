@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Checkbox, Heading, MultiStep, Text, TextInput } from "@ignite-ui/react";
+import { useRouter } from "next/router";
 import { ArrowRight } from "phosphor-react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
@@ -72,12 +73,16 @@ export default function TimeIntervals() {
         control: control
     })
 
+    const router = useRouter()
+
     const intervals = watch("intervals")
 
     const handleSetTimeIntervals = async (data: any) => {
         const formData = data as TimeIntervalsFormOutput
 
         await api.post("/users/time-intervals", formData)
+
+        await router.push("/register/update-profile")
     }
 
     return(
