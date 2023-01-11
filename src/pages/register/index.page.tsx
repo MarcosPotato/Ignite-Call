@@ -10,6 +10,7 @@ import { Container, Form, FormError, Header } from "./styles";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { api } from "../../lib/axios";
+import { NextSeo } from "next-seo";
 
 const registerFormSchema = z.object({
     username: z
@@ -61,6 +62,8 @@ export default function Register() {
         }
     },[router.query?.username, setValue])
     return (
+        <>
+        <NextSeo title="Crie uma conta | Ignite Call"/>
         <Container>
             <Header>
                 <Heading as="strong">
@@ -98,5 +101,6 @@ export default function Register() {
                 </Button>
             </Form>
         </Container>
+        </>
     )
 }

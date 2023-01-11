@@ -6,6 +6,7 @@ import { ArrowRight, Check } from "phosphor-react";
 
 import { Container, Header } from "../styles";
 import { AuthError, ConnectBox, ConnectItens } from "./styles";
+import { NextSeo } from 'next-seo';
 
 export default function ConnectCallendar() {
 
@@ -24,6 +25,11 @@ export default function ConnectCallendar() {
     }
 
     return (
+        <>
+        <NextSeo 
+            title="Conecte usa agenda do Google | Ignite Call" 
+            noindex
+        />
         <Container>
             <Header>
                 <Heading as="strong">
@@ -71,5 +77,6 @@ export default function ConnectCallendar() {
                 </ConnectBox>
             </Header>
         </Container>
+        </>
     )
 }
