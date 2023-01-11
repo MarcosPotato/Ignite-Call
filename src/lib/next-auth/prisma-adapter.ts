@@ -1,19 +1,19 @@
-import { NextApiRequest, NextApiResponse, NextPageContext } from "next"
-import { Adapter } from "next-auth/adapters"
-import { parseCookies, destroyCookie } from "nookies"
+import { NextApiRequest, NextApiResponse, NextPageContext } from 'next'
+import { Adapter } from 'next-auth/adapters'
+import { parseCookies, destroyCookie } from 'nookies'
 
-import { prisma } from "../prisma"
+import { prisma } from '../prisma'
 
 export function PrismaAdapter(
-  req: NextApiRequest | NextPageContext['req'], 
-  res: NextApiResponse | NextPageContext['res']
+  req: NextApiRequest | NextPageContext['req'],
+  res: NextApiResponse | NextPageContext['res'],
 ): Adapter {
   return {
     async createUser(user) {
-      const { "@ignitecall:userId": userIdOnCookies } = parseCookies({ req })
+      const { '@ignitecall:userId': userIdOnCookies } = parseCookies({ req })
 
-      if(!userIdOnCookies){
-        throw new Error("User id not found on cokkies")
+      if (!userIdOnCookies) {
+        throw new Error('User id not found on cokkies')
       }
 
       const prismaUser = await prisma.user.update({
@@ -22,11 +22,11 @@ export function PrismaAdapter(
           fullname: user.name as string,
           email: user.email,
           avatar_url: user.avatar_url,
-        }
+        },
       })
 
-      destroyCookie({ res }, "@ignitecall:userId", {
-        path: "/"
+      destroyCookie({ res }, '@ignitecall:userId', {
+        path: '/',
       })
 
       return {
@@ -36,16 +36,16 @@ export function PrismaAdapter(
         email: prismaUser.email!,
         avatar_url: prismaUser.avatar_url!,
         emailVerified: null,
-        fullname: prismaUser.fullname
+        fullname: prismaUser.fullname,
       }
     },
 
     async getUser(id) {
       const user = await prisma.user.findUnique({
-        where: { id }
+        where: { id },
       })
 
-      if(!user){
+      if (!user) {
         return null
       }
 
@@ -56,16 +56,16 @@ export function PrismaAdapter(
         email: user.email!,
         avatar_url: user.avatar_url!,
         emailVerified: null,
-        fullname: user.fullname
+        fullname: user.fullname,
       }
     },
 
     async getUserByEmail(email) {
       const user = await prisma.user.findUnique({
-        where: { email }
+        where: { email },
       })
 
-      if(!user){
+      if (!user) {
         return null
       }
 
@@ -76,25 +76,24 @@ export function PrismaAdapter(
         email: user.email!,
         avatar_url: user.avatar_url!,
         emailVerified: null,
-        fullname: user.fullname
+        fullname: user.fullname,
       }
     },
 
     async getUserByAccount({ providerAccountId, provider }) {
-
       const account = await prisma.account.findUnique({
         where: {
           provider_provider_account_id: {
             provider,
-            provider_account_id: providerAccountId
-          }
+            provider_account_id: providerAccountId,
+          },
         },
         include: {
-          user: true
-        }
+          user: true,
+        },
       })
 
-      if(!account){
+      if (!account) {
         return null
       }
 
@@ -107,7 +106,7 @@ export function PrismaAdapter(
         email: user.email!,
         avatar_url: user.avatar_url!,
         emailVerified: null,
-        fullname: user.fullname
+        fullname: user.fullname,
       }
     },
 
@@ -118,7 +117,7 @@ export function PrismaAdapter(
           fullname: user.name as string,
           email: user.email,
           avatar_url: user.avatar_url,
-        }
+        },
       })
 
       return {
@@ -128,7 +127,7 @@ export function PrismaAdapter(
         email: updatedUser.email!,
         avatar_url: updatedUser.avatar_url!,
         emailVerified: null,
-        fullname: updatedUser.fullname!
+        fullname: updatedUser.fullname!,
       }
     },
 
@@ -145,8 +144,8 @@ export function PrismaAdapter(
           token_type: account.token_type,
           scope: account.scope,
           id_token: account.id_token,
-          session_state: account.session_state
-        }
+          session_state: account.session_state,
+        },
       })
     },
 
@@ -155,38 +154,38 @@ export function PrismaAdapter(
         data: {
           user_id: userId,
           expires,
-          session_token: sessionToken
-        }
+          session_token: sessionToken,
+        },
       })
 
-      return{
+      return {
         sessionToken,
         userId,
-        expires
+        expires,
       }
     },
 
     async getSessionAndUser(sessionToken) {
       const sessionPrisma = await prisma.session.findUnique({
         where: {
-          session_token: sessionToken
+          session_token: sessionToken,
         },
         include: {
-          user: true
-        }
+          user: true,
+        },
       })
 
-      if(!sessionPrisma){
+      if (!sessionPrisma) {
         return null
       }
 
       const { user, ...session } = sessionPrisma
 
-      return{
+      return {
         session: {
           userId: session.user_id,
           expires: session.expires,
-          sessionToken: session.session_token
+          sessionToken: session.session_token,
         },
         user: {
           id: user.id,
@@ -195,8 +194,8 @@ export function PrismaAdapter(
           email: user.email!,
           avatar_url: user.avatar_url!,
           emailVerified: null,
-          fullname: user.fullname
-        }
+          fullname: user.fullname,
+        },
       }
     },
 
@@ -205,23 +204,23 @@ export function PrismaAdapter(
         where: { session_token: sessionToken! },
         data: {
           expires,
-          user_id: userId
-        }
+          user_id: userId,
+        },
       })
 
       return {
         sessionToken: primaSession.session_token,
         userId: primaSession.user_id,
-        expires: primaSession.expires
+        expires: primaSession.expires,
       }
     },
 
-    async deleteSession(sessionToken){
+    async deleteSession(sessionToken) {
       await prisma.session.delete({
         where: {
-          session_token: sessionToken
-        }
+          session_token: sessionToken,
+        },
       })
-    }
+    },
   }
 }

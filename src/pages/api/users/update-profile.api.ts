@@ -1,38 +1,38 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { unstable_getServerSession } from "next-auth";
-import { z } from "zod";
-import { prisma } from "../../../lib/prisma";
-import { buildNextAuthOptions } from "../auth/[...nextauth].api";
+import { NextApiRequest, NextApiResponse } from 'next'
+import { unstable_getServerSession } from 'next-auth'
+import { z } from 'zod'
+import { prisma } from '../../../lib/prisma'
+import { buildNextAuthOptions } from '../auth/[...nextauth].api'
 
 const updateProfileBodySchema = z.object({
-    bio: z.string()
+  bio: z.string(),
 })
 
 export default async function handler(
-    req: NextApiRequest,
-    res: NextApiResponse
-){
-    if(req.method !== "PUT"){
-        return res.status(405).end()
-    }
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
+  if (req.method !== 'PUT') {
+    return res.status(405).end()
+  }
 
-    const session = await unstable_getServerSession(
-        req,
-        res,
-        buildNextAuthOptions(req, res)
-    )
+  const session = await unstable_getServerSession(
+    req,
+    res,
+    buildNextAuthOptions(req, res),
+  )
 
-    if(!session){
-        return res.status(401).end()
-    }
+  if (!session) {
+    return res.status(401).end()
+  }
 
-    const { bio } = updateProfileBodySchema.parse(req.body)
+  const { bio } = updateProfileBodySchema.parse(req.body)
 
-    // alterar para o mysql e usar o create many
-    await prisma.user.update({
-        where: { id: session.user.id },
-        data: { bio }
-    })
+  // alterar para o mysql e usar o create many
+  await prisma.user.update({
+    where: { id: session.user.id },
+    data: { bio },
+  })
 
-    return res.status(204).end()
+  return res.status(204).end()
 }

@@ -6,39 +6,38 @@ import { setCookie } from 'nookies'
 import { prisma } from '../../../lib/prisma'
 
 export default async function handler(
-    req: NextApiRequest, 
-    res: NextApiResponse
-){
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
+  if (req.method !== 'POST') {
+    return res.status(405).end()
+  }
 
-    if(req.method !== "POST"){
-        return res.status(405).end()
-    }
+  const { fullname, username } = req.body
 
-    const { fullname, username } = req.body
+  const userExists = await prisma.user.findUnique({
+    where: {
+      username,
+    },
+  })
 
-    const userExists = await prisma.user.findUnique({
-        where: {
-            username: username
-        }
+  if (userExists) {
+    return res.status(400).json({
+      message: 'This username already used',
     })
+  }
 
-    if(userExists){
-        return res.status(400).json({ 
-            message: "This username already used" 
-        })
-    }
+  const user = await prisma.user.create({
+    data: {
+      fullname,
+      username,
+    },
+  })
 
-    const user = await prisma.user.create({
-        data: {
-            fullname,
-            username,
-        },
-    })
+  setCookie({ res }, '@ignitecall:userId', user.id, {
+    maxAge: 60 * 60 * 24 * 7, // 7 dias
+    path: '/',
+  })
 
-    setCookie({ res: res }, "@ignitecall:userId", user.id, {
-        maxAge: 60 * 60 * 24 * 7, //7 dias
-        path: "/",
-    })
-
-    return res.status(201).json(user)
+  return res.status(201).json(user)
 }
