@@ -16,7 +16,10 @@ export const buildNextAuthOptions = (
                 clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
                 authorization: {
                     params: {
-                        scope: "https://www.googleapis.com/auth/admin.directory.resource.calendar https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile"
+                        pronpt: "consert",
+                        access_type: "offline",
+                        response_type: "code",
+                        scope: "https://www.googleapis.com/auth/admin.directory.resource.calendar https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/calendar"
                     }
                 },
                 profile(profile: GoogleProfile){

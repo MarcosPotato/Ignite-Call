@@ -11,7 +11,11 @@ interface Availability{
     availablity: number[]
 }
 
-export function CalendarStep(){
+interface ClanedarStepProps{
+    onSelectDateTime: (date: Date) => void
+}
+
+export function CalendarStep({ onSelectDateTime }: ClanedarStepProps){
 
     const [selectedDate, setSelectedDate] = useState<Date | null>(null)
 
@@ -39,6 +43,14 @@ export function CalendarStep(){
         enabled: !!selectedDate
     })
 
+    const handleSelectTime = (hour: number) => {
+        const dateTime = dayjs(selectedDate)
+            .set("hour", hour)
+            .startOf("hour")
+        
+        onSelectDateTime(dateTime.toDate())
+    }
+
     return (
         <Container isTimePickerOpen={ isDateSelected }>
             <Calendar 
@@ -55,6 +67,7 @@ export function CalendarStep(){
                             <TimePickerItem 
                                 key={hour}
                                 disabled={ !availability.availablity.includes(hour) }
+                                onClick={() => handleSelectTime(hour)}
                             >
                                 { String(hour).padStart(2, "0") }:00h
                             </TimePickerItem>

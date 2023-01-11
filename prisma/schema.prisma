@@ -29,14 +29,14 @@ model User {
 model Account {
   id                  String  @id @default(cuid())
   user_id             String
-  type                String
+  type                String  @db.Text
   provider            String
   provider_account_id String
   refresh_token       String? @db.Text
   access_token        String? @db.Text
   expires_at          Int?
   token_type          String?
-  scope               String?
+  scope               String? @db.Text
   id_token            String? @db.Text
   session_state       String?
 

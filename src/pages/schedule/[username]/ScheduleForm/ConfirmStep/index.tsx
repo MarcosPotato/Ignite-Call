@@ -1,8 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Text, TextArea, TextInput } from "@ignite-ui/react";
+import dayjs from "dayjs";
+import { useRouter } from "next/router";
 import { CalendarBlank, Clock } from "phosphor-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { api } from "../../../../../lib/axios";
 import { ConfirmForm, FormActions, FormError, FormHeader } from "./style";
 
 const confirmFormSchema = z.object({
@@ -13,7 +16,12 @@ const confirmFormSchema = z.object({
 
 type ConfirmFormSchema = z.infer<typeof confirmFormSchema>
 
-export function ConfirmStep(){
+interface ConfirmStepProps{
+    schedulingDate: Date
+    onCancelConfirmation: () => void
+}
+
+export function ConfirmStep({ schedulingDate, onCancelConfirmation }: ConfirmStepProps){
 
     const {
         register,
@@ -23,8 +31,22 @@ export function ConfirmStep(){
         resolver: zodResolver(confirmFormSchema)
     })
 
-    const handleConfirm = async(data: ConfirmFormSchema) => {
+    const router = useRouter()
 
+    const username = String(router.query.username)
+
+    const describedDate = dayjs(schedulingDate).format('DD[ de ]MMMM[ de ]YYYY')
+    const describedTime = dayjs(schedulingDate).format('HH:mm[h]')
+
+    const handleConfirm = async(data: ConfirmFormSchema) => {
+        await api.post(`/users/${username}/schedule`, {
+            name: data.name,
+            email: data.email,
+            observations: data.email,
+            date: schedulingDate
+        })
+
+        onCancelConfirmation()
     }
 
     return (
@@ -35,11 +57,11 @@ export function ConfirmStep(){
             <FormHeader>
                 <Text>
                     <CalendarBlank/>
-                    22 de setem
+                    { describedDate }
                 </Text>
                 <Text>
                     <Clock />
-                    18:00h
+                    { describedTime }
                 </Text>
             </FormHeader>
             <label>
@@ -72,7 +94,11 @@ export function ConfirmStep(){
                 <TextArea { ...register("observations") } />
             </label>
             <FormActions>
-                <Button type="button" variant="tertiary">
+                <Button 
+                    type="button" 
+                    variant="tertiary"
+                    onClick={ onCancelConfirmation }
+                >
                     Cancelar
                 </Button>
                 <Button type="submit">
