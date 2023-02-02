@@ -13,7 +13,7 @@ export function PrismaAdapter(
       const { '@ignitecall:userId': userIdOnCookies } = parseCookies({ req })
 
       if (!userIdOnCookies) {
-        throw new Error('User id not found on cokkies')
+        throw new Error('User id not found on cookies')
       }
 
       const prismaUser = await prisma.user.update({
